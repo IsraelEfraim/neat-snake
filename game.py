@@ -368,6 +368,7 @@ ax = fig.add_subplot(111)
 line_best_fitness, = ax.plot(list_best_fitness, 'r-')  # Returns a tuple of line objects, thus the comma
 
 pop = population.Population('config')
+
 if len(sys.argv) > 1:
     pop = load_object(sys.argv[1])
     print("Reading popolation from " + sys.argv[1])
