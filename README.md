@@ -1,5 +1,5 @@
-# neat-snake
-Integrating Neural Evolution In Augmented Topologies in a snake game to make it a self learner.
+# neat-tron
+Integrating Neural Evolution In Augmented Topologies in a tron game to make it a self learner.
 
 ![](demo/demo.gif)
 
