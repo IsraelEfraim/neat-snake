@@ -1,7 +1,7 @@
+import neat
 import pygame
 from pygame.locals import *
-import tron
-import neat
+from model import tron
 import math
 import random
 
@@ -120,13 +120,18 @@ def run_tron_game(tron_game, block_size):
     pygame.display.set_caption('TheTron')
     screen = pygame.display.set_mode(to_block((width, height)))
 
-    player_skin = pygame.Surface(block)
-    player_skin.fill((255, 255, 255))
+    green = pygame.Surface(block)
+    green.fill((0, 255, 0))
+
+    blue = pygame.Surface(block)
+    blue.fill((0, 0, 255))
+
+    colors = [blue, green]
 
     clock = pygame.time.Clock()
 
     while not tron_game.is_over():
-        clock.tick(120)
+        clock.tick(0)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -144,7 +149,7 @@ def run_tron_game(tron_game, block_size):
             for column in range(height):
                 if not board[line][column] is None:
                     screen.blit(
-                        player_skin, (line * block_size, column * block_size))
+                        colors[board[line][column]], (line * block_size, column * block_size))
 
         pygame.display.update()
 
