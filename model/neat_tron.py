@@ -28,11 +28,14 @@ class NeatTronPlayer(tron.TronPlayer):
             self.moves += 1
             self.head = head
 
-            [left, right] = self.nn.activate(self.get_data(board))
+            output = self.nn.activate(self.get_data(board))
+            direction = output.index(max(output))
 
-            if left:
+            if direction == 0:
+                pass
+            if direction == 1:
                 self.direction = tron.Direction.shift(self.direction, -2)
-            elif right:
+            if direction == 2:
                 self.direction = tron.Direction.shift(self.direction, 2)
 
             return self.direction
@@ -44,25 +47,45 @@ def chunks(lst, n):
     return [lst[i:i + n] for i in range(0, len(lst), n)]
 
 
+def even_chunks(lst, n):
+    return [chunk + [lst[random.randint(0, len(lst) - 1)]
+                     for idx in range(0, n - len(chunk))] for chunk in chunks(lst, n)]
+
+
 def run_generation(genomes, config):
     # create networks
     generation = [(neat.nn.FeedForwardNetwork.create(genome, config), genome)
                   for _, genome in genomes]
 
+    for _, g in generation:
+        g.fitness = (0, 0)
+
     random.shuffle(generation)
 
-    for s1, s2 in chunks(generation, 2):
+    for s1, s2 in even_chunks(generation, 2):
         nn1, g1 = s1
         nn2, g2 = s2
 
-        p1 = NeatTronPlayer(tron.Direction.RIGHT, distance, nn1)
-        p2 = NeatTronPlayer(tron.Direction.LEFT, distance, nn2)
+        d1 = tron.Direction.ALL[1 + random.randint(0, 3) * 2]
+        d2 = tron.Direction.ALL[1 + random.randint(0, 3) * 2]
+
+        p1 = NeatTronPlayer(d1, distance, nn1)
+        p2 = NeatTronPlayer(d2, distance, nn2)
 
         tron_game = create_tron_game(80, 80, [p1, p2])
         winner = run_tron_game(tron_game, 10)
 
-        g1.fitness = 1 / p1.moves + 1 if winner == 0 else 0
-        g2.fitness = 1 / p2.moves + 1 if winner == 1 else 0
+        def fit(fitness, moves, winner):
+            qty, total = fitness
+            curr_score = moves * 2 if winner else 1
+            return (qty + 1, total + curr_score)
+
+        g1.fitness = fit(g1.fitness, p1.moves, winner == 0)
+        g2.fitness = fit(g2.fitness, p2.moves, winner == 1)
+
+    for _, g in generation:
+        qty, total = g.fitness
+        g.fitness = total / qty
 
 
 def to_block_unit(block_size):
@@ -103,7 +126,7 @@ def run_tron_game(tron_game, block_size):
     clock = pygame.time.Clock()
 
     while not tron_game.is_over():
-        clock.tick(0)
+        clock.tick(120)
 
         for event in pygame.event.get():
             if event.type == QUIT:
