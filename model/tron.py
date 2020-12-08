@@ -5,9 +5,13 @@ class Direction:
     _, UP, _, RIGHT, _, DOWN, _, LEFT = ALL
 
     @staticmethod
-    def opposite_of(direction):
+    def shift(direction, amount):
         idx = Direction.ALL.index(direction)
-        return Direction.ALL[(idx + len(Direction.ALL) // 2) % len(Direction.ALL)]
+        return Direction.ALL[(idx + amount) % len(Direction.ALL)]
+
+    @staticmethod
+    def opposite_of(direction):
+        return Direction.shift(len(Direction.ALL) // 2)
 
 
 class TronGame:
@@ -98,10 +102,47 @@ class TronGame:
         return self.remaining
 
     def get_winner(self):
-        return None
+        winner = None
+
+        def is_active(enumerated):
+            _, player = enumerated
+            active, _, _ = player
+
+            return active
+
+        if self.is_over():
+            remaining = list(filter(is_active, enumerate(self.players)))
+
+            if remaining:
+                [player] = remaining
+                winner, _ = player
+
+        return winner
 
     def is_over(self):
         return self.get_remaining() <= 1
+
+
+class TronPlayer:
+    def __init__(self, direction):
+        self.seed = direction
+        self.direction = direction
+        self.head = None
+
+    def reset(self):
+        self.direction = self.seed
+        self.head = None
+
+    def action(self):
+        def feedback(head, board):
+            self.head = head_to(head, self.direction)
+            return self.direction
+
+        return feedback
+
+    def set_direction(self, direction, override=False):
+        if override or not direction == Direction.opposite_of(self.direction):
+            self.direction = direction
 
 
 def head_to(head, heading):
@@ -118,18 +159,20 @@ def get_orientation_vector(heading):
             for idx in range(-3, 4)]
 
 
-def get_boundary(head, heading, tron_game):
-    board = tron_game.get_board()
+def get_boundary(head, heading, board):
     last = head
     x, y = head_to(head, heading)
 
-    while (x >= 0 and x < tron_game.width and y >= 0 and y < tron_game.height) and board[x][y] is None:
+    width = len(board[0]) if board else 0
+    height = len(board)
+
+    while (x >= 0 and x < width and y >= 0 and y < height) and board[x][y] is None:
         last = (x, y)
         x, y = head_to((x, y), heading)
 
     return last
 
 
-def get_all_boundaries(head, heading, tron_game):
+def get_all_boundaries(head, heading, board):
     directions = get_orientation_vector(heading)
-    return map(lambda direction: get_boundary(head, direction, tron_game), directions)
+    return map(lambda direction: get_boundary(head, direction, board), directions)

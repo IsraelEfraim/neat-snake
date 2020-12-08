@@ -1,0 +1,58 @@
+Code for tron_player keyboard listener
+
+if event.type == KEYDOWN:
+    if event.key == K_w:
+        tron_player_1.set_direction(tron.Direction.UP)
+    elif event.key == K_s:
+        tron_player_1.set_direction(tron.Direction.DOWN)
+    elif event.key == K_a:
+        tron_player_1.set_direction(tron.Direction.LEFT)
+    elif event.key == K_d:
+        tron_player_1.set_direction(tron.Direction.RIGHT)
+    elif event.key == K_UP:
+        tron_player_2.set_direction(tron.Direction.UP)
+    elif event.key == K_DOWN:
+        tron_player_2.set_direction(tron.Direction.DOWN)
+    elif event.key == K_LEFT:
+        tron_player_2.set_direction(tron.Direction.LEFT)
+    elif event.key == K_RIGHT:
+        tron_player_2.set_direction(tron.Direction.RIGHT)
+
+Code for TronPlayer base class
+
+class TronPlayer:
+    def __init__(self, direction):
+        self.seed = direction
+        self.direction = direction
+        self.head = None
+
+    def reset(self):
+        self.direction = self.seed
+        self.head = None
+
+    def action(self):
+        def feedback(head, board):
+            self.head = tron.head_to(head, self.direction)
+            return self.direction
+
+        return feedback
+
+    def set_direction(self, direction, override=False):
+        if override or not direction == tron.Direction.opposite_of(self.direction):
+            self.direction = direction
+
+Code for input radar radar_colors
+
+radar_colors = [(0, 0, 255), (0, 255, 0), (255, 255, 0),
+                    (255, 0, 0), (128, 0, 128), (140, 111, 214), (255, 192, 203)]
+
+# Distances
+for color, pos in zip(radar_colors, radar):
+    x, y = to_block(pos)
+    x, y = x + block_size / 2, y + block_size / 2
+
+    hx, hy = to_block(tron_player_1.head)
+    hx, hy = hx + block_size / 2, hy + block_size / 2
+
+    pygame.draw.line(screen, color, (hx, hy), (x, y), 1)
+    pygame.draw.circle(screen, color, (x, y), 3)
