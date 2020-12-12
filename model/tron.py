@@ -72,22 +72,6 @@ class TronGame:
         else:
             self.invalidate_player(idx)
 
-    '''
-    def next_position(self, head, direction):
-        x, y = head
-
-        if direction == TronGame.UP:
-            y -= 1
-        elif direction == TronGame.DOWN:
-            y += 1
-        elif direction == TronGame.LEFT:
-            x -= 1
-        elif direction == TronGame.RIGHT:
-            x += 1
-
-        return (x, y)
-    '''
-
     def invalidate_player(self, idx):
         active, head, action = self.players[idx]
 
