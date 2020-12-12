@@ -161,10 +161,8 @@ if __name__ == '__main__':
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                 neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    # Create core evolution algorithm class
     p = neat.Population(config)
 
-    # Add reporter for fancy statistical result
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
