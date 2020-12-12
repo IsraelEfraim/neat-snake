@@ -120,13 +120,13 @@ def run_tron_game(tron_game, block_size):
     pygame.display.set_caption('TheTron')
     screen = pygame.display.set_mode(to_block((width, height)))
 
-    green = pygame.Surface(block)
-    green.fill((0, 255, 0))
-
     blue = pygame.Surface(block)
-    blue.fill((0, 0, 255))
+    blue.fill((0, 193, 247))
 
-    colors = [blue, green]
+    yellow = pygame.Surface(block)
+    yellow.fill((248, 194, 33))
+
+    colors = [blue, yellow]
 
     clock = pygame.time.Clock()
 
@@ -140,7 +140,7 @@ def run_tron_game(tron_game, block_size):
         tron_game.next_state()
         board = tron_game.get_board()
 
-        screen.fill((0, 0, 0))
+        screen.fill((46, 52, 64))
 
         # Render
 
