@@ -5,6 +5,8 @@ from model import tron
 import math
 import random
 
+generation_number = 0
+
 
 class NeatTronPlayer(tron.TronPlayer):
     def __init__(self, direction, distance, nn):
@@ -53,6 +55,9 @@ def even_chunks(lst, n):
 
 
 def run_generation(genomes, config):
+    global generation_number
+    generation_number += 1
+
     # create networks
     generation = [(neat.nn.FeedForwardNetwork.create(genome, config), genome)
                   for _, genome in genomes]
@@ -119,6 +124,7 @@ def run_tron_game(tron_game, block_size):
 
     pygame.display.set_caption('TheTron')
     screen = pygame.display.set_mode(to_block((width, height)))
+    generation_font = pygame.font.SysFont("Arial", 24)
 
     blue = pygame.Surface(block)
     blue.fill((0, 193, 247))
@@ -129,6 +135,8 @@ def run_tron_game(tron_game, block_size):
     colors = [blue, yellow]
 
     clock = pygame.time.Clock()
+
+    global generation_number
 
     while not tron_game.is_over():
         clock.tick(0)
@@ -151,12 +159,20 @@ def run_tron_game(tron_game, block_size):
                     screen.blit(
                         colors[board[line][column]], (line * block_size, column * block_size))
 
+        text = generation_font.render(
+            "Generation : " + str(generation_number), True, (255, 255, 255))
+        text_rect = text.get_rect()
+        text_rect.center = (screen.get_width() / 2, 30)
+        screen.blit(text, text_rect)
+
         pygame.display.update()
 
     return tron_game.get_winner()
 
 
 if __name__ == '__main__':
+    pygame.font.init()
+
     config_path = './model/config-feedforward.txt'
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                 neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
